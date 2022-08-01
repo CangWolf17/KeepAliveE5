@@ -1,0 +1,33 @@
+# buggy github
+name: Invoke API
+
+on:
+  schedule:
+    - cron: "18 */2 * * *"
+  workflow_dispatch:
+
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+      - name: Setup python and poetry
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - uses: Gr1N/setup-poetry@v4
+
+      - name: Install requirements
+        run: poetry install
+
+      - name: Test Api
+        env:
+          PASSWD: ${{ secrets.PASSWD }}
+        run: bash routine.sh
+
+      - name: Commit and push
+        run: bash reset.sh "update app config"
